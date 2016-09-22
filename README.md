@@ -12,6 +12,8 @@ Dataset
 
 The data set has dimensions (5572, 2). The first column called "label" takes the values "spam" or "ham" while the second column names "message" simply contains the sms message as a string. There are 5572 such messages.  
 
+4825 ham labels vs 747 spam labels. Remember to take into account that there are many more ham than spam messages when using cross validation to determine performance.
+
 References
 ==========
 
