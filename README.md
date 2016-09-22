@@ -12,6 +12,11 @@ Dataset
 
 The data set has dimensions (5572, 2). The first column called "label" takes the values "spam" or "ham" while the second column names "message" simply contains the sms message as a string. There are 5572 such messages.  
 
+References
+==========
 
+* Machine Learning Techniques in Spam Filtering by Konstantin Tretyakov.  
+* Python Machine Learning by Sebastian Raschka.   
+* http://radimrehurek.com/data_science_python/   
 
 
