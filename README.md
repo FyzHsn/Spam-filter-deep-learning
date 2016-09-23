@@ -14,6 +14,16 @@ The data set has dimensions (5572, 2). The first column called "label" takes the
 
 4825 ham labels vs 747 spam labels. Remember to take into account that there are many more ham than spam messages when using cross validation to determine performance.
 
+Note
+----
+
+1. Simple NLP approach - create a bag of words.   
+2. To keep an understanding of the order of words one can use n-grams.   
+3. In addition to the words from the sms, what is the end performance if I add another feature column which shows the proportion of words that are all upper case. Spams seem to have a lot of words like "WINNER!!". What if I added the number of words in the messages? Or the number of characters?   
+4. Think of the process above as dimension picking for performance optimization. Using PCA and LDA we reduced the number of dimensions to describe the data. Furthermore, think of the message as an element in a vector space. Then, what feature volumns we implement is equivalent to picking the approximate representation in a particular basis.  
+5. It is not always wise to reduce the number of dimensions.   
+6. Another lesson: If adding more data points leads to better performance of the training and the test data set, that is an indication that the model is not complex enough to capture all the information. In that setting, we can add more data or increase the complexity of the algorithm. Now, I am thinking, as in this case here, perhaps adding additional features could be the answer. I'll have to play with this idea to find out.   
+
 References
 ==========
 
