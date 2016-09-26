@@ -19,6 +19,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from nltk.corpus import stopwords
+from nltk.stem.porter import PorterStemmer
+from nltk.stem.lancaster import LancasterStemmer
 from pandas import read_csv
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
@@ -32,11 +34,11 @@ from sklearn.pipeline import Pipeline
 ################################
 
 """
-Read spam file from location - the data come from the website
+Read spam file from location - the data came from the website
 http://archive.ics.uci.edu/ml/datasets/SMS+Spam+Collection.
-I saved it on my hard drive and load it from there.
+I saved it on my hard drive and loaded it from there.
 
-feature columns for the data frame sms are:
+feature columns for the data frame "sms" are:
 label - spam or ham.
 message - corresponding text messages
 
@@ -59,9 +61,9 @@ print(sms.message[3])
 #sms.hist(column='char_num', by='label', bins=30)
 #sms.hist(column='word_num', by='label', bins=30)
 
-#############################
-# 2. PREPROCESSING SMS DATA #
-#############################
+#############################################
+# 2. PROCESSING TEXT DOCUMENTS INTO VECTORS #
+#############################################
 
 ## Test data frame
 #columns = ['message']
@@ -86,16 +88,24 @@ print('First 5 words of dictionary: ',
 # frequency using a built in function from sklearn
 tfidf = TfidfTransformer()
 np.set_printoptions(precision=2)
-print(tfidf.fit_transform(bag).toarray())
+tfidf_sms = tfidf.fit_transform(bag)
 
 # Looking at individual sms's we see that we do not need to do any
-# cleaning up of texts/
+# cleaning up of texts.
 
+# processing documents into tokens
+def tokenizer(text):
+    return text.split()
 
+porter = PorterStemmer()
+def tokenizer_porter(text):
+    return [porter.stem(word) for word in text.split()]
 
+lancaster = LancasterStemmer()
+def tokenizer_lancaster(text):
+    return [lancaster.stem(word) for word in text.split()]
 
-
-
-
-
+####################################################
+# 3. TRAINING A MODEL VIA NAIVE BAYESIAN ALGORITHM #
+####################################################
 
