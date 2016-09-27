@@ -28,6 +28,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.grid_search import GridSearchCV
+from sklearn.svm import SVC
 from sklearn.pipeline import Pipeline
 from sklearn.cross_validation import train_test_split
 from sklearn.cross_validation import cross_val_score
@@ -68,13 +69,6 @@ print(sms.message[3])
 # 2. PROCESSING TEXT DOCUMENTS INTO VECTORS #
 #############################################
 
-## Test data frame
-#columns = ['message']
-#index = np.arange(3)
-#sms = pd.DataFrame(columns=columns, index=index)         
-#sms['message'] = np.array([["The sun is shining"], ["The weather is sweet"],
-#                  ["The sun is shining and the weather is sweet"]])
-         
 # processing documents into tokens
 def tokenizer(text):
     return text.split()
@@ -92,7 +86,7 @@ def tokenizer_lancaster(text):
 # dictionary element. Kanaris, Houvardas, and Stamatatos found that
 # n-gram choices of 3 and 4 yield good performance for anti-spam 
 # filters.
-count = CountVectorizer(analyzer=tokenizer, ngram_range=(1,1))
+count = CountVectorizer(analyzer=tokenizer, ngram_range=(1,3))
 bag = count.fit_transform(sms['message'])
 
 print('Number of words in bow: ', len(count.vocabulary_))
@@ -112,12 +106,7 @@ sms_tfidf = tfidf.fit_transform(bag)
 # 3. TRAINING A MODEL VIA NAIVE BAYESIAN ALGORITHM #
 ####################################################
 
-#X_train = sms_tfidf.loc[:2500].values
-#y_train = sms.loc[:2500, 'label'].values
-#X_test = sms_tfidf.loc[2500:, 'message'].values
-#y_test = sms.loc[2500:, 'label'].values
-
-#spam_detector = GaussianNB().fit(sms_tfidf, sms.loc[:, 'label'].values)
+# Also experimenting with SVM shows that to be the optimal model
 def split_into_lemmas(message):
     message = message.lower()
     words = TextBlob(message).words
@@ -129,7 +118,7 @@ X_train, X_test, y_train, y_test = \
 lr_pipe = Pipeline([
     ('bag', CountVectorizer(analyzer=split_into_lemmas)),
     ('tfidf', TfidfTransformer()),
-    ('clf', LogisticRegression(random_state=0))])
+    ('clf', SVC(kernel='linear', C=1.0, random_state=0))])
     
 scores = cross_val_score(lr_pipe,
                          X_train,
@@ -140,17 +129,78 @@ scores = cross_val_score(lr_pipe,
 print('CV accuracy: %.3f +/- %.3f' % (np.mean(scores)*100, np.std(scores)*100))                         
 
 
+###########################################################################
+# INTERLUDE: TESTING HOW TO ADD FEATURE VECTORS ON TOP OF VECTORIZED TEXT #
+###########################################################################
 
+## Test data frame
+#columns = ['message', 'label']
+#index = np.arange(3)
+#sms = pd.DataFrame(columns=columns, index=index)         
+#sms['message'] = np.array([["The sun is shining"], ["The weather is sweet"],
+#                  ["The sun is shining and the weather is sweet"]])
+#sms['label'] = np.array([['ham'], ['ham'], ['ham']])
+#sms['charnum'] = sms['message'].map(lambda text: len(text))
+#sms['wordnum'] = sms['message'].map(lambda text: len(text.split()))
+#
+#bag = CountVectorizer(analyzer=split_into_lemmas).fit(sms['message'])
+#sms_text_vector = bag.transform(sms['message'])
+#
+#sms_tfidf = TfidfTransformer().fit_transform(sms_text_vector)
+#
+#char_num = sms['charnum'].values
+#char_num.shape = (len(sms['charnum']), 1)
+#
+#word_num = sms['wordnum'].values
+#word_num.shape = (len(sms['wordnum']), 1)
+#X_train = np.hstack((sms_tfidf.toarray(), char_num))
+#print(X_train)
+#
+#X_train = np.hstack((sms_tfidf.toarray(), word_num))
+#print(X_train)
 
+########################################################################
+###################################################################### #
+# IMPORTANT LESSON: WHEN IN DOUBT, SIMPLIFY PROBLEM AND PLAY WITH IT # #
+###################################################################### #
+########################################################################
 
+######################################
+# 4. FEATURE ENGINEERING - USING SVM #
+######################################
 
+# Add character and word numbers in text msg to check predictive accuracy via
+# SVM algorithm.
+sms['charnum'] = sms['message'].map(lambda text: len(text))
+sms['wordnum'] = sms['message'].map(lambda text: len(text.split()))
 
+bag = CountVectorizer(analyzer=split_into_lemmas).fit(sms['message'])
+sms_text_vector = bag.transform(sms['message'])
 
+sms_tfidf = TfidfTransformer().fit_transform(sms_text_vector)
 
+char_num = sms['charnum'].values
+char_num.shape = (len(sms['charnum']), 1)
 
+word_num = sms['wordnum'].values
+word_num.shape = (len(sms['wordnum']), 1)
 
+sms_engineered = np.hstack((sms_tfidf.toarray(), char_num))
+sms_engineered = pd.DataFrame(sms_engineered)
 
+# X_train = np.hstack((sms_tfidf.toarray(), word_num))
 
+X_train, X_test, y_train, y_test = \
+    train_test_split(sms_engineered, sms['label'], test_size=0.3)
 
+svm = SVC(kernel='linear', C=1.0, random_state=0)
+    
+scores = cross_val_score(svm,
+                         sms_engineered,
+                         sms['label'],
+                         cv=5,
+                         scoring='accuracy')
+                         
+print('CV accuracy: %.3f +/- %.3f' % (np.mean(scores)*100, np.std(scores)*100))                         
 
 
