@@ -6,16 +6,17 @@ words. Afterwards, I go back to looking at the effect of including additional
 features such as the number of characters, words or words in all caps to the 
 basic vector representation of the text. 
 
+Furhermore, I might implement out-of-core learning as a redundancy for memory
+problems.
+
 Author: Faiyaz Hasan
 Data created: September 27, 2016
-
 """
 
 # import packages
 import numpy as np
 import pandas as pd
 from nltk.corpus import stopwords
-from textblob import TextBlob
 from pandas import read_csv
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.cross_validation import cross_val_score
@@ -25,12 +26,11 @@ from sklearn.svm import SVC
 file_location = r'C:\Users\Windows\Dropbox\AllStuff\Spam_filter\Data\SMSSpamCollection'
 sms = pd.read_csv(file_location, sep='\t', names=["label", "message"])
 
-# lemmatizing function
-def split_into_lemmas(message):
-    message = message.lower()
-    words = TextBlob(message).words
-    return [word.lemma for word in words]
-
+# lemmatizing function - remove stop words
+stop = stopwords.words('english')
+def tokenizer_porter(text):
+    return [words for words in text.split() if words not in stop]
+        
 # Add character and word numbers in text msg to check predictive accuracy via
 # SVM algorithm.
 sms['charnum'] = sms['message'].map(lambda text: len(text))

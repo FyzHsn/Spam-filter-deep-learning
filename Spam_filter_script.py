@@ -133,44 +133,13 @@ print('CV accuracy: %.3f +/- %.3f' % (np.mean(scores)*100, np.std(scores)*100))
 # INTERLUDE: TESTING HOW TO ADD FEATURE VECTORS ON TOP OF VECTORIZED TEXT #
 ###########################################################################
 
-## Test data frame
-#columns = ['message', 'label']
-#index = np.arange(3)
-#sms = pd.DataFrame(columns=columns, index=index)         
-#sms['message'] = np.array([["The sun is shining"], ["The weather is sweet"],
-#                  ["The sun is shining and the weather is sweet"]])
-#sms['label'] = np.array([['ham'], ['ham'], ['ham']])
-#sms['charnum'] = sms['message'].map(lambda text: len(text))
-#sms['wordnum'] = sms['message'].map(lambda text: len(text.split()))
-#
-#bag = CountVectorizer(analyzer=split_into_lemmas).fit(sms['message'])
-#sms_text_vector = bag.transform(sms['message'])
-#
-#sms_tfidf = TfidfTransformer().fit_transform(sms_text_vector)
-#
-#char_num = sms['charnum'].values
-#char_num.shape = (len(sms['charnum']), 1)
-#
-#word_num = sms['wordnum'].values
-#word_num.shape = (len(sms['wordnum']), 1)
-#X_train = np.hstack((sms_tfidf.toarray(), char_num))
-#print(X_train)
-#
-#X_train = np.hstack((sms_tfidf.toarray(), word_num))
-#print(X_train)
-
-########################################################################
-###################################################################### #
-# IMPORTANT LESSON: WHEN IN DOUBT, SIMPLIFY PROBLEM AND PLAY WITH IT # #
-###################################################################### #
-########################################################################
-
-######################################
-# 4. FEATURE ENGINEERING - USING SVM #
-######################################
-
-# Add character and word numbers in text msg to check predictive accuracy via
-# SVM algorithm.
+# Test data frame
+columns = ['message', 'label']
+index = np.arange(3)
+sms = pd.DataFrame(columns=columns, index=index)         
+sms['message'] = np.array([["The sun is shining"], ["The weather is sweet"],
+                  ["The sun is shining and the weather is sweet"]])
+sms['label'] = np.array([['ham'], ['ham'], ['ham']])
 sms['charnum'] = sms['message'].map(lambda text: len(text))
 sms['wordnum'] = sms['message'].map(lambda text: len(text.split()))
 
@@ -184,20 +153,46 @@ char_num.shape = (len(sms['charnum']), 1)
 
 word_num = sms['wordnum'].values
 word_num.shape = (len(sms['wordnum']), 1)
+X_train = np.hstack((sms_tfidf.toarray(), char_num))
+print(X_train)
 
-sms_engineered = np.hstack((sms_tfidf.toarray(), char_num))
-sms_engineered = pd.DataFrame(sms_engineered)
+X_train = np.hstack((sms_tfidf.toarray(), word_num))
+print(X_train)
 
-# X_train = np.hstack((sms_tfidf.toarray(), word_num))
+########################################################################
+###################################################################### #
+# IMPORTANT LESSON: WHEN IN DOUBT, SIMPLIFY PROBLEM AND PLAY WITH IT # #
+###################################################################### #
+########################################################################
 
-X_train, X_test, y_train, y_test = \
-    train_test_split(sms_engineered, sms['label'], test_size=0.3)
+#########################################
+# DETERMINE NUMBER OF WORDS IN ALL CAPS #
+#########################################
+
+def capwords(text):
+    text_words = text.split()  
+    text_words_upper_case = [word.upper() for word in text_words]
+    return len(set(text_words) & set(text_words_upper_case))
+    
+# Add character and word numbers in text msg to check predictive accuracy via
+# SVM algorithm.
+sms['capnum'] = sms['message'].map(lambda text: capwords(text))
+
+bag = CountVectorizer(analyzer=split_into_lemmas).fit(sms['message'])
+sms_text_vector = bag.transform(sms['message'])
+
+sms_tfidf = TfidfTransformer().fit_transform(sms_text_vector)
+
+capnum = sms['capnum'].values
+capnum.shape = (len(sms['capnum']), 1)
+
+sms_engineered = np.hstack((sms_tfidf.toarray(), capnum))
 
 svm = SVC(kernel='linear', C=1.0, random_state=0)
     
 scores = cross_val_score(svm,
-                         sms_engineered,
-                         sms['label'],
+                         sms_engineered[:3500],
+                         sms['label'].values[:3500],
                          cv=5,
                          scoring='accuracy')
                          
