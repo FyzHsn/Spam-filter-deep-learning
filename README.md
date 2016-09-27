@@ -14,6 +14,14 @@ The data set has dimensions (5572, 2). The first column called "label" takes the
 
 4825 ham labels vs 747 spam labels. Remember to take into account that there are many more ham than spam messages when using cross validation to determine performance.
 
+Stages of algorithm development
+-------------------------------
+
+1. Train SVM, Logistic regression algorithms and optimize parameters for bag-of-words combined with downweighting frequently occuring words via tf-idf approach. DONE. CV accuracy: 96.3 +/- 0.5 for Logistic regression. 
+2. Next, try adding additional features such as (i) number of words in msg, (ii) number of characters, (iii) number of words in all caps to check if it leads to performance improvement. Optimize feature space.    
+3. Do a grid parameter search to find optimally performing parameter on feature space.   
+4. Apply multiple layer neural net and deep learning.   
+
 Note
 ----
 
