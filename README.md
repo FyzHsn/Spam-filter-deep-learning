@@ -17,7 +17,13 @@ The data set has dimensions (5572, 2). The first column called "label" takes the
 Stages of algorithm development
 -------------------------------
 
-1. Train SVM, Logistic regression algorithms and optimize parameters for bag-of-words combined with downweighting frequently occuring words via tf-idf approach. DONE. CV accuracy: 96.3 +/- 0.5 for Logistic regression. 98.0 +/- 0.3 for Linear SVM with regularization constant C=1.0 for L2 norm.   
+1. Train SVM, Logistic regression algorithms and optimize parameters for bag-of-words combined with downweighting frequently occuring words via tf-idf approach. DONE. CV accuracy: 96.3 +/- 0.5 for Logistic regression. 98.0 +/- 0.3 for Linear SVM with regularization constant C=1.0 for L2 norm. 
+Using n-gram = 2, SVM - 98.4 +/- 0.3.
+Using n-gram = 3, SVM - 98.7 +/- 0.3.
+Using n-gram = 4, SVM - 98.5 +/- 0.4.
+
+Hence, n-gram = 3 is optimal.
+
 2. Next, try adding additional features such as (i) number of words in msg, (ii) number of characters, (iii) number of words in all caps to check if it leads to performance improvement. Optimize feature space.    
 3. Do a grid parameter search to find optimally performing parameter on feature space.   
 4. Apply multiple layer neural net and deep learning.   
