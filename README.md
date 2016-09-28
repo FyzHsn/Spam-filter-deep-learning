@@ -5,7 +5,7 @@ Project objective
 -----------------
 
 * Train machine learning algorithm to distinguish between spam and ham text messages that are pre-labelled.   
-* Learn NLP, naive bayes and deep learning algorithms/packages in Python in a practical context.   
+* Learn NLP basics (DONE), naive bayes (DONE), out-of-core learning combined with online algorithms to deal with large datasets (DONE) and deep learning algorithms/packages in Python in a practical context.   
 
 Dataset 
 -------
