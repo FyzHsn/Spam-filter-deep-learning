@@ -58,7 +58,7 @@ print(sms.groupby('label').describe())
 #sms['char_num'] = sms['message'].map(lambda text: len(text))
 #sms['word_num'] = sms['message'].map(lambda text: len(text.split()))                            
 
-print(sms.head(4))
+print(sms.head(10))
 print(sms.message[3])
 
 # plot length of characters and number of words for ham and spam.

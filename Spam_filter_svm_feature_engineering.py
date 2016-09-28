@@ -27,10 +27,8 @@ from sklearn.linear_model import SGDClassifier
 # 1. LOAD DATA #
 ################
 
-# read in spam sms file from computer hard drive
+# sms file from computer hard drive - no need to load data
 file_location = r'C:\Users\Windows\Dropbox\AllStuff\Spam_filter\Data\SMSSpamCollection'
-sms = pd.read_csv(file_location, sep='\t', names=["label", "message"])
-
 
 ##############################
 # 2. PREPROCESSING TEXT DATA #
@@ -38,7 +36,7 @@ sms = pd.read_csv(file_location, sep='\t', names=["label", "message"])
 
 # lemmatizing function - remove stop words
 stop = stopwords.words('english')
-def tokenizer_porter(text):
+def tokenizer(text):
     return [words for words in text.split() if words not in stop]
         
 # Add character and word numbers in text msg to check predictive accuracy via
@@ -64,7 +62,7 @@ print(nrows)
 def stream_docs(path):
     with open(path) as csv:
         for line in csv:
-            text, label = line[5:-1], line[:4]
+            text, label = line[4:-1], line[:4]
             if (label == 'ham\t'):
                 label = 'ham'
             yield text, label
@@ -92,9 +90,36 @@ print(get_minibatch(doc_stream, size=5))
 # 4. TRAINING MODELS VIA ONLINE ALGORITHMS AND OUT-OF-CORE LEARNING #
 #####################################################################
 
+# vectorize text via HashingVectorizer
+vect = HashingVectorizer(decode_error='ignore',
+                         n_features=2**21,
+                         preprocessor=None,
+                         tokenizer=tokenizer)
+clf = SGDClassifier(loss='hinge', random_state=1, n_iter=1)
 
+classes = np.array(['ham', 'spam'])
 
-
+for _ in range(1):
+    X_train, y_train = get_minibatch(doc_stream, size=3)
+    if not X_train:
+        break
+     # additional feature
+    print("***************")    
+    print(X_train)   
+#    sms = X_train.value.map(lambda text: capwords(text))
+#    capnum = sms.values
+#    capnum.shape = (len(sms), 1)
+    X_train = vect.transform(X_train)
+    
+    # additional feature
+#    X_train = np.hstack((capnum, X_train))
+    
+    print(X_train.shape)
+    clf.partial_fit(X_train, y_train, classes=classes)
+    
+X_test, y_test = get_minibatch(doc_stream, size=(nrows - 5 - 4000))
+X_test = vect.transform(X_test)
+print('Accuracy: %.3f' % (clf.score(X_test, y_test)*100))    
 
 
 
