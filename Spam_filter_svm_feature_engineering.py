@@ -119,7 +119,8 @@ vect = HashingVectorizer(decode_error='ignore',
                          n_features=2**21,
                          preprocessor=None,
                          tokenizer=tokenizer)
-clf = SGDClassifier(loss='hinge', random_state=1, n_iter=1)
+clf = SGDClassifier(loss='hinge', penalty = 'l2',
+                    alpha=0.0001, random_state=1, n_iter=1)
 
 classes = np.array(['ham', 'spam'])
 
