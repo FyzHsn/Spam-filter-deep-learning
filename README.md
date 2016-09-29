@@ -19,7 +19,8 @@ Stages of algorithm development
 
 1. Train SVM, Logistic regression algorithms and optimize parameters for bag-of-words combined with downweighting frequently occuring words via tf-idf approach. DONE. CV accuracy: 96.3 +/- 0.5 for Logistic regression. 98.0 +/- 0.3 for Linear SVM with regularization constant C=1.0 for L2 norm. Using various ngrams, we find no difference in performance of the model.  
 
-2. Next, try adding additional features such as (i) number of words in msg, (ii) number of characters, (iii) number of words in all caps to check if it leads to performance improvement. Optimize feature space.    
+2. Next, try adding additional features such as (i) number of words in msg, (ii) number of characters, (iii) number of words in all caps to check if it leads to performance improvement. Optimize feature space. DONE. I find that adding other features in any combination worsens the performance of the algorithm SVM.   
+
 3. Do a grid parameter search to find optimally performing parameter on feature space.   
 4. Apply multiple layer neural net and deep learning.   
 
